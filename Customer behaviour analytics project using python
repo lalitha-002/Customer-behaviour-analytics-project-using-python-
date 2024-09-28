@@ -1,0 +1,305 @@
+#import necessary libraries
+import collections
+import dataclasses
+import logging
+import math
+from datetime import datetime
+
+
+# Initialize logger
+logging.basicConfig(level=logging.INFO)
+
+# Define classes
+@dataclasses.dataclass
+class UserProfile:
+    id: int
+    firstname: str
+    lastname: str
+    email: str
+    age: int
+    gender: str
+    purchase_history: list
+
+    def __repr__(self):
+        return f'UserProfile({self.id}, {self.firstname}, {self.lastname})'
+
+
+@dataclasses.dataclass
+class CustomerInteractions:
+    id: int
+    customer_id: int
+    interaction_type: str
+    interaction_date: datetime
+
+    def __repr__(self):
+        return f"CustomerInteractions({self.id}, {self.customer_id})"
+
+
+# Define dictionaries
+users = {}
+interactions = {}
+
+# Define functions
+def create_user(user_data):
+    user_id = len(users) + 1
+    logging.info(f"Creating user profile for {user_id}...")
+    new_user = UserProfile(user_id, user_data[0], user_data[1], user_data[2], user_data[3], user_data[4], [])
+    users[user_id] = new_user
+    logging.info(f"New user profile {user_id} created successfully")
+    return new_user
+
+def update_user(user_id, user_data):
+    if user_id in users:
+        user = users[user_id]
+        logging.info(f"Updating user profile {user_id}...")
+        user.firstname = user_data.get('firstname', user.firstname)
+        user.lastname = user_data.get("lastname", user.lastname)
+        user.email = user_data.get('email', user.email)
+        user.age = user_data.get('age', user.age)
+        user.gender = user_data.get('gender', user.gender)
+        logging.info(f'User profile {user_id} updated successfully')
+        return user
+    else:
+        logging.error(f"User profile {user_id} not found")
+        return None
+
+def read_user(user_id):
+    if user_id in users:
+        user = users[user_id]
+        logging.info(f"Reading user profile {user_id}")
+        return user
+    else:
+        logging.error(f"User profile {user_id} not found")
+        return None
+
+def delete_user(user_id):
+    if user_id in users:
+        user = users[user_id]
+        logging.info(f"Deleting user profile {user_id}...")
+        del users[user_id]
+        logging.info(f"User profile {user_id} deleted successfully")
+        return user
+    else:
+        logging.error(f"User profile {user_id} not found")
+        return None
+
+def create_interaction(interaction_data):
+    interaction_id = len(interactions) + 1
+    logging.info(f"Creating customer interaction {interaction_id}...")
+    new_interaction = CustomerInteractions(
+        interaction_id, interaction_data[0], interaction_data[1], interaction_data[2]
+    )
+    interactions[interaction_id] = new_interaction
+    logging.info(f"Customer interaction {interaction_id} created successfully")
+    return new_interaction
+
+def segment_customers(criteria):
+    segmented_customers = collections.defaultdict(list)
+    if criteria == "frequent buyers":
+        # Iterate over all customers
+        for user_id in users:
+            user = users[user_id]
+            # Count purchases for each customer
+            num_purchases = len(user.purchase_history)
+            # Based on criteria, segment customers
+            if num_purchases >= 3:
+                segmented_customers["frequent_buyers"].append(user.id)
+            else:
+                segmented_customers["non_frequent_buyers"].append(user.id)
+        logging.info(f"Customers segmented based on criteria: {criteria}")
+        return segmented_customers
+    else:
+        logging.warning(f"Invalid criteria: {criteria}")
+        return None
+
+def predict_purchase_behavior(customer_id):
+    if customer_id in users:
+        prediction = 0
+        user = users[customer_id]
+        # Iterate over customer purchase_history
+        for purchase in user.purchase_history:
+            # Calculate purchase frequency (example logic)
+            purchase_frequency = math.pow(purchase, 1/2)
+            # Add up predicted purchase frequency for each purchase
+            prediction += purchase_frequency
+        logging.info(f"Predicted purchase behavior for customer {customer_id}: {prediction}")
+        return prediction
+    else:
+        logging.error(f"User profile {customer_id} not found")
+        return None
+
+
+# Example usage
+if __name__ == "__main__":
+    # Create some users
+    user1 = create_user(["Alice", "Smith", "alice@example.com", 30, "Female"])
+    user2 = create_user(["Bob", "Brown", "bob@example.com", 25, "Male"])
+
+    # Update a user
+    update_user(user1.id, {"age": 31})
+
+    # Read a user
+    print(read_user(user1.id))
+
+    # Create interactions
+    create_interaction([user1.id, "purchase", datetime.now()])
+    create_interaction([user2.id, "support", datetime.now()])
+
+    # Segment customers
+    segment = segment_customers("frequent buyers")
+    print(segment)
+
+    # Predict purchase behavior
+    print(predict_purchase_behavior(user1.id))#import necessary libraries
+import collections
+import dataclasses
+import logging
+import math
+from datetime import datetime
+
+
+# Initialize logger
+logging.basicConfig(level=logging.INFO)
+
+# Define classes
+@dataclasses.dataclass
+class UserProfile:
+    id: int
+    firstname: str
+    lastname: str
+    email: str
+    age: int
+    gender: str
+    purchase_history: list
+
+    def __repr__(self):
+        return f'UserProfile({self.id}, {self.firstname}, {self.lastname})'
+
+
+@dataclasses.dataclass
+class CustomerInteractions:
+    id: int
+    customer_id: int
+    interaction_type: str
+    interaction_date: datetime
+
+    def __repr__(self):
+        return f"CustomerInteractions({self.id}, {self.customer_id})"
+
+
+# Define dictionaries
+users = {}
+interactions = {}
+
+# Define functions
+def create_user(user_data):
+    user_id = len(users) + 1
+    logging.info(f"Creating user profile for {user_id}...")
+    new_user = UserProfile(user_id, user_data[0], user_data[1], user_data[2], user_data[3], user_data[4], [])
+    users[user_id] = new_user
+    logging.info(f"New user profile {user_id} created successfully")
+    return new_user
+
+def update_user(user_id, user_data):
+    if user_id in users:
+        user = users[user_id]
+        logging.info(f"Updating user profile {user_id}...")
+        user.firstname = user_data.get('firstname', user.firstname)
+        user.lastname = user_data.get("lastname", user.lastname)
+        user.email = user_data.get('email', user.email)
+        user.age = user_data.get('age', user.age)
+        user.gender = user_data.get('gender', user.gender)
+        logging.info(f'User profile {user_id} updated successfully')
+        return user
+    else:
+        logging.error(f"User profile {user_id} not found")
+        return None
+
+def read_user(user_id):
+    if user_id in users:
+        user = users[user_id]
+        logging.info(f"Reading user profile {user_id}")
+        return user
+    else:
+        logging.error(f"User profile {user_id} not found")
+        return None
+
+def delete_user(user_id):
+    if user_id in users:
+        user = users[user_id]
+        logging.info(f"Deleting user profile {user_id}...")
+        del users[user_id]
+        logging.info(f"User profile {user_id} deleted successfully")
+        return user
+    else:
+        logging.error(f"User profile {user_id} not found")
+        return None
+
+def create_interaction(interaction_data):
+    interaction_id = len(interactions) + 1
+    logging.info(f"Creating customer interaction {interaction_id}...")
+    new_interaction = CustomerInteractions(
+        interaction_id, interaction_data[0], interaction_data[1], interaction_data[2]
+    )
+    interactions[interaction_id] = new_interaction
+    logging.info(f"Customer interaction {interaction_id} created successfully")
+    return new_interaction
+
+def segment_customers(criteria):
+    segmented_customers = collections.defaultdict(list)
+    if criteria == "frequent buyers":
+        # Iterate over all customers
+        for user_id in users:
+            user = users[user_id]
+            # Count purchases for each customer
+            num_purchases = len(user.purchase_history)
+            # Based on criteria, segment customers
+            if num_purchases >= 3:
+                segmented_customers["frequent_buyers"].append(user.id)
+            else:
+                segmented_customers["non_frequent_buyers"].append(user.id)
+        logging.info(f"Customers segmented based on criteria: {criteria}")
+        return segmented_customers
+    else:
+        logging.warning(f"Invalid criteria: {criteria}")
+        return None
+
+def predict_purchase_behavior(customer_id):
+    if customer_id in users:
+        prediction = 0
+        user = users[customer_id]
+        # Iterate over customer purchase_history
+        for purchase in user.purchase_history:
+            # Calculate purchase frequency (example logic)
+            purchase_frequency = math.pow(purchase, 1/2)
+            # Add up predicted purchase frequency for each purchase
+            prediction += purchase_frequency
+        logging.info(f"Predicted purchase behavior for customer {customer_id}: {prediction}")
+        return prediction
+    else:
+        logging.error(f"User profile {customer_id} not found")
+        return None
+
+
+# Example usage
+if __name__ == "__main__":
+    # Create some users
+    user1 = create_user(["Alice", "Smith", "alice@example.com", 30, "Female"])
+    user2 = create_user(["Bob", "Brown", "bob@example.com", 25, "Male"])
+
+    # Update a user
+    update_user(user1.id, {"age": 31})
+
+    # Read a user
+    print(read_user(user1.id))
+
+    # Create interactions
+    create_interaction([user1.id, "purchase", datetime.now()])
+    create_interaction([user2.id, "support", datetime.now()])
+
+    # Segment customers
+    segment = segment_customers("frequent buyers")
+    print(segment)
+
+    # Predict purchase behavior
+    print(predict_purchase_behavior(user1.id))
